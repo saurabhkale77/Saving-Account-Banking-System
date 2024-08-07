@@ -25,7 +25,7 @@ type CreateUser struct {
 	Name     string `json:"name"`
 	Address  string `json:"address"`
 	Email    string `json:"email"`
-	Password string `json:"password"`
+	Password string `json:"password,omitempty"`
 	Mobile   string `json:"mobile"`
 	Role     string `json:"role"`
 }
@@ -34,7 +34,7 @@ type UpdateUser struct {
 	User_id  int    `json:"user_id,omitempty"`
 	Name     string `json:"name"`
 	Address  string `json:"address"`
-	Password string `json:"password"`
+	Password string `json:"password,omitempty"`
 	Mobile   string `json:"mobile"`
 }
 
@@ -43,7 +43,7 @@ type Response struct {
 	Name     string `json:"name"`
 	Address  string `json:"address"`
 	Email    string `json:"email"`
-	Password string `json:"password"`
+	Password string `json:"password,omitempty"`
 	Mobile   string `json:"mobile"`
 	Role     string `json:"role"`
 }

@@ -21,7 +21,7 @@ const (
 	getTokenDetailsQuery string = "SELECT user_id,role FROM user where email=?"
 	getLoginDetails      string = "SELECT email, password FROM user"
 	getCountofUser       string = "SELECT COUNT(user_id) FROM user"
-	getUser              string = "SELECT name, address, email, password, mobile, role FROM user where user_id=?"
+	getUser              string = "SELECT name, address, email, mobile, role FROM user where user_id=?"
 	GetMyAccounts        string = "SELECT acc_no, branch_id, acc_type, balance FROM account WHERE user_id=? ORDER BY created_at "
 )
 
@@ -121,11 +121,10 @@ func (db *UserStore) UpdateUser(req specs.UpdateUser, user_id int) (specs.Update
 	}
 
 	res := specs.UpdateUser{
-		User_id:  user_id,
-		Name:     req.Name,
-		Address:  req.Address,
-		Mobile:   req.Mobile,
-		Password: req.Password,
+		User_id: user_id,
+		Name:    req.Name,
+		Address: req.Address,
+		Mobile:  req.Mobile,
 	}
 	return res, nil
 }
@@ -141,7 +140,7 @@ func (db *UserStore) GetUser(user_id int) (specs.CreateUser, error) {
 
 	var res specs.CreateUser
 	for rows.Next() {
-		if err := rows.Scan(&res.Name, &res.Address, &res.Email, &res.Password, &res.Mobile, &res.Role); err != nil {
+		if err := rows.Scan(&res.Name, &res.Address, &res.Email, &res.Mobile, &res.Role); err != nil {
 			log.Print("error while scanning row: ", err)
 			continue
 		}

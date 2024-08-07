@@ -29,7 +29,7 @@ func NewAdminRepo(db *sql.DB) AdminStorer {
 }
 
 const (
-	getUserDetailsQuery   string = `SELECT user_id, name, address, email, password, mobile, role FROM user ORDER BY user_id DESC`
+	getUserDetailsQuery   string = `SELECT user_id, name, address, email, mobile, role FROM user ORDER BY user_id`
 	userUpdateQuery       string = `UPDATE user SET name=?, address=?,email=?, password=?, mobile=?,role=?, updated_at=? WHERE user_id=?`
 	getBranchDetailsQuery string = `SELECT id, name, location FROM branch ORDER BY id`
 )
@@ -77,7 +77,7 @@ func (db *AdminStore) ListUsers(ctx context.Context) ([]specs.Response, error) {
 
 	for rows.Next() {
 		var res specs.Response
-		if err := rows.Scan(&res.User_id, &res.Name, &res.Address, &res.Email, &res.Password, &res.Mobile, &res.Role); err != nil {
+		if err := rows.Scan(&res.User_id, &res.Name, &res.Address, &res.Email, &res.Mobile, &res.Role); err != nil {
 			log.Print("error while scanning row: ", err)
 			continue
 		}

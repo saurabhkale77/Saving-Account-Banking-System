@@ -29,7 +29,7 @@ type Transaction struct {
 
 type TransactionResponse struct {
 	Account_no int     `json:"acc_no"`
-	Balance    float64 `json:"balance,omitempty"`
+	Balance    float64 `json:"balance"`
 }
 
 type DeleteAccount struct {

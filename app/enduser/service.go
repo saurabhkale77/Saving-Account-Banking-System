@@ -63,6 +63,7 @@ func (us *service) CreateLogin(ctx context.Context, req specs.CreateLoginRequest
 	expectedPwd, ok := LoginMap[req.Username]
 	bcrErr := bcrypt.CompareHashAndPassword([]byte(expectedPwd), []byte(req.Password))
 	if !ok || bcrErr != nil {
+		fmt.Println(ok)
 		return "", fmt.Errorf("invalid credentials")
 	}
 
