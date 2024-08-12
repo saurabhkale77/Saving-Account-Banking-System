@@ -11,11 +11,11 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/rs/cors"
 	"go.uber.org/zap"
 )
 
 func main() {
-	fmt.Println("Hello")
 	ctx, cancel := context.WithCancel(context.Background())
 	log.Print(ctx)
 	defer cancel()
@@ -23,7 +23,7 @@ func main() {
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 
-	logger.Info("Starting Banking Application...")
+	logger.Info("=> Starting Banking Application...")
 	fmt.Println("*** WELCOME to BANKING SYSTEM !! ***")
 
 	// To Initialize Database
@@ -32,20 +32,30 @@ func main() {
 		log.Fatalln(err)
 	}
 	defer database.Close()
+
 	// repository.InsertSeedData()
 
 	// Initialize Service
 	services := app.NewServices(database)
 
-	// Initialize Router
+	// Initialize RouterCORS middleware
 	router := app.NewRouter(services)
+
+	// CORS middleware
+	cors := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		AllowedHeaders:   []string{"*"},
+	})
 
 	server := &http.Server{
 		Addr:    "localhost:1925",
-		Handler: router,
+		Handler: cors.Handler(router),
 	}
 
 	go func() {
+		fmt.Println("Server started")
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("\n Server error: %s", err)
 		}
@@ -60,12 +70,10 @@ func main() {
 	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	log.Print("Shutting Down Banking Application...")
+	log.Print("=> Shutting Down Banking Application...")
 
 	// Attempt to gracefully shut down the server
 	if err := server.Shutdown(ctx); err != nil {
 		log.Fatalf("Server shutdown error: %s\n", err)
 	}
-
-	log.Print("Banking Application has been gracefully shut down.")
 }
