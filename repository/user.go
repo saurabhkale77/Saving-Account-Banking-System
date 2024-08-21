@@ -29,6 +29,7 @@ type UserStorer interface {
 	RepositoryTrasanctions
 
 	GetLoginDetails() (response map[string]string, err error)
+	CheckUserAlreadyExists(req specs.CreateUser) (bool, error)
 	AddUser(req specs.CreateUser) (specs.Response, error)
 	UpdateUser(req specs.UpdateUser, user_id int) (specs.UpdateUser, error)
 	GetUser(user_id int) (specs.CreateUser, error)
@@ -64,6 +65,30 @@ func (db *UserStore) GetLoginDetails() (response map[string]string, err error) {
 
 	return LoginMap, nil
 
+}
+
+func (db *UserStore) CheckUserAlreadyExists(req specs.CreateUser) (bool, error) {
+	var count int64
+
+	QueryExecuter := db.initiateQueryExecutor(db.DB)
+	row := QueryExecuter.QueryRow("SELECT COUNT(user_id) FROM user where email=?", req.Email)
+	err := row.Scan(&count)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			count = 0
+			fmt.Println("in err == sql.ErrNoRows, count = ", count)
+		}
+		fmt.Println("something went wrong")
+		return true, fmt.Errorf("something went wrong")
+	}
+
+	if count >= 1 {
+		fmt.Println("User with same email already exists!")
+		return true, nil
+	}
+
+	fmt.Println("at the end")
+	return false, nil
 }
 
 func (db *UserStore) AddUser(req specs.CreateUser) (specs.Response, error) {

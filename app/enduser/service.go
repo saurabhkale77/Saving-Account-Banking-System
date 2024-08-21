@@ -102,6 +102,16 @@ func (us *service) CreateSignup(ctx context.Context, req specs.CreateUser) (spec
 		return specs.Response{}, err
 	}
 
+	isUserExist, err := us.UserRepo.CheckUserAlreadyExists(req)
+
+	if err != nil {
+		return specs.Response{}, err
+	}
+
+	if isUserExist {
+		return specs.Response{}, fmt.Errorf("User with same email already exists!")
+	}
+
 	response, err := us.UserRepo.AddUser(req)
 	if err != nil {
 		return specs.Response{}, err
