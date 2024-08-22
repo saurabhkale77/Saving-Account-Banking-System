@@ -39,13 +39,14 @@ type UpdateUser struct {
 }
 
 type Response struct {
-	User_id  int    `json:"user_id"`
-	Name     string `json:"name"`
-	Address  string `json:"address"`
-	Email    string `json:"email"`
-	Password string `json:"password,omitempty"`
-	Mobile   string `json:"mobile"`
-	Role     string `json:"role"`
+	User_id  int             `json:"user_id"`
+	Name     string          `json:"name"`
+	Address  string          `json:"address"`
+	Email    string          `json:"email"`
+	Password string          `json:"password,omitempty"`
+	Mobile   string          `json:"mobile"`
+	Role     string          `json:"role"`
+	Accounts []GetMyAccounts `json:"accounts"`
 }
 
 type BranchDetails struct {
@@ -55,10 +56,12 @@ type BranchDetails struct {
 }
 
 type GetMyAccounts struct {
-	Acc_no    int     `json:"acc_no"`
-	Branch_id int     `json:"branch_id"`
-	Acc_Type  string  `json:"acc_type"`
-	Balance   float64 `json:"balance"`
+	Acc_no          int     `json:"acc_no"`
+	Branch_id       int     `json:"branch_id"`
+	Branch_name     string  `json:"branch_name"`
+	Branch_location string  `json:"branch_location"`
+	Acc_Type        string  `json:"acc_type"`
+	Balance         float64 `json:"balance"`
 }
 
 type LoginToken struct {

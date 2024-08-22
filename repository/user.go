@@ -22,7 +22,7 @@ const (
 	getLoginDetails      string = "SELECT email, password FROM user"
 	getCountofUser       string = "SELECT COUNT(user_id) FROM user"
 	getUser              string = "SELECT name, address, email, mobile, role FROM user where user_id=?"
-	GetMyAccounts        string = "SELECT acc_no, branch_id, acc_type, balance FROM account WHERE user_id=? ORDER BY created_at "
+	GetMyAccounts        string = "SELECT acc_no, branch_id, name, location, acc_type, balance FROM account, branch WHERE user_id=? AND account.branch_id = branch.id ORDER BY account.created_at "
 )
 
 type UserStorer interface {
@@ -117,7 +117,11 @@ func (db *UserStore) AddUser(req specs.CreateUser) (specs.Response, error) {
 		return specs.Response{}, fmt.Errorf("errror While inserting sign-up data in db")
 	}
 	user_id := count + 1
-	stmt.Exec(user_id, req.Name, req.Address, req.Email, string(hashPwd), req.Mobile, strings.ToLower(req.Role), time.Now().Unix(), time.Now().Unix())
+	_, err = stmt.Exec(user_id, req.Name, req.Address, req.Email, string(hashPwd), req.Mobile, strings.ToLower(req.Role), time.Now().Unix(), time.Now().Unix())
+
+	if err != nil {
+		return specs.Response{}, fmt.Errorf(err.Error())
+	}
 
 	res := specs.Response{
 		User_id:  int(user_id),
@@ -178,13 +182,23 @@ func (db *UserStore) GetMyAccounts(user_id int) ([]specs.GetMyAccounts, error) {
 	QueryExecuter := db.initiateQueryExecutor(db.DB)
 	rows, err := QueryExecuter.Query(GetMyAccounts, user_id)
 	if err != nil {
+		fmt.Println("hi")
 		log.Println(err)
 		return []specs.GetMyAccounts{}, err
 	}
 
+	fmt.Println("hello")
+
+	var arr, _ = rows.Columns()
+	for str := range arr {
+		fmt.Println(str)
+	}
+
+	fmt.Println("ok")
+
 	for rows.Next() {
 		var res specs.GetMyAccounts
-		if err := rows.Scan(&res.Acc_no, &res.Branch_id, &res.Acc_Type, &res.Balance); err != nil {
+		if err := rows.Scan(&res.Acc_no, &res.Branch_id, &res.Branch_name, &res.Branch_location, &res.Acc_Type, &res.Balance); err != nil {
 			log.Print("error while scanning row: ", err)
 			continue
 		}

@@ -62,7 +62,7 @@ func InitializeDB() (*sql.DB, error) {
 	statement, err = db.Prepare(`
 	CREATE TABLE IF NOT EXISTS account(
 		acc_no INTEGER PRIMARY KEY,
-		user_id INTEGER NOT NULL UNIQUE,
+		user_id INTEGER NOT NULL,
 		branch_id INTEGER NOT NULL,
 		acc_type VARCHAR(10) NOT NULL,
 		balance FLOAT NOT NULL,

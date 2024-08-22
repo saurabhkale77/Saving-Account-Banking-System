@@ -52,7 +52,11 @@ func (db *AdminStore) CreateAccount(req specs.CreateAccountReq) (specs.CreateAcc
 		return specs.CreateAccountReq{}, fmt.Errorf("errror While inserting CreateAccount data in db")
 	}
 	acc_no := (count + 1)
-	stmt.Exec(acc_no, req.User_id, req.Branch_id, req.Account_type, req.Balance, time.Now().Unix(), time.Now().Unix())
+	_, err = stmt.Exec(acc_no, req.User_id, req.Branch_id, req.Account_type, req.Balance, time.Now().Unix(), time.Now().Unix())
+
+	if err != nil {
+		return specs.CreateAccountReq{}, fmt.Errorf(err.Error())
+	}
 
 	res := specs.CreateAccountReq{
 		Account_no:   int(acc_no),
@@ -62,6 +66,36 @@ func (db *AdminStore) CreateAccount(req specs.CreateAccountReq) (specs.CreateAcc
 		User_id:      req.User_id,
 	}
 	return res, nil
+}
+
+func (db *AdminStore) GetCustomerAccounts(user_id int) ([]specs.GetMyAccounts, error) {
+	var result []specs.GetMyAccounts
+	QueryExecuter := db.initiateQueryExecutor(db.DB)
+	rows, err := QueryExecuter.Query(GetMyAccounts, user_id)
+	if err != nil {
+		fmt.Println("hi")
+		log.Println(err)
+		return []specs.GetMyAccounts{}, err
+	}
+
+	fmt.Println("hello")
+
+	var arr, _ = rows.Columns()
+	for str := range arr {
+		fmt.Println(str)
+	}
+
+	fmt.Println("ok")
+
+	for rows.Next() {
+		var res specs.GetMyAccounts
+		if err := rows.Scan(&res.Acc_no, &res.Branch_id, &res.Branch_name, &res.Branch_location, &res.Acc_Type, &res.Balance); err != nil {
+			log.Print("error while scanning row: ", err)
+			continue
+		}
+		result = append(result, res)
+	}
+	return result, nil
 }
 
 func (db *AdminStore) ListUsers(ctx context.Context) ([]specs.Response, error) {
@@ -81,6 +115,10 @@ func (db *AdminStore) ListUsers(ctx context.Context) ([]specs.Response, error) {
 			log.Print("error while scanning row: ", err)
 			continue
 		}
+
+		accounts, _ := db.GetCustomerAccounts(res.User_id)
+		res.Accounts = accounts
+
 		result = append(result, res)
 	}
 	return result, nil
