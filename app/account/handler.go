@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func Deposit(accService Service) func(w http.ResponseWriter, r *http.Request) { //Post
@@ -89,7 +90,7 @@ func Delete(accService Service) func(w http.ResponseWriter, r *http.Request) { /
 		ctx := r.Context()
 
 		tknStr := r.Header.Get("Authorization")
-		user_id, _, err := accService.Authenticate(tknStr)
+		user_id, role, err := accService.Authenticate(tknStr)
 		if err != nil {
 			specs.ErrorUnauthorizedAccess(err, w)
 			return
@@ -104,6 +105,15 @@ func Delete(accService Service) func(w http.ResponseWriter, r *http.Request) { /
 		if err != nil {
 			specs.ErrorInternalServer(err, w)
 			return
+		}
+
+		if strings.EqualFold(role, "admin") {
+			paramValue = queryParams.Get("user_id")
+			user_id, err = strconv.Atoi(paramValue)
+			if err != nil {
+				specs.ErrorInternalServer(err, w)
+				return
+			}
 		}
 
 		err = req.ValidateDeleteReq()

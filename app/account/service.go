@@ -30,7 +30,7 @@ func NewService(AccountRepo repository.AccountStorer) Service {
 }
 
 // All Account related bussiness logic here onwards=>
-func (us *service) Authenticate(tknStr string) (user_id int, response string, err error) {
+func (us *service) Authenticate(tknStr string) (user_id int, role string, err error) {
 
 	jwtkey := []byte(os.Getenv("jwtkey"))
 	claims := &specs.Claims{}
@@ -45,7 +45,7 @@ func (us *service) Authenticate(tknStr string) (user_id int, response string, er
 	if !tkn.Valid {
 		return 0, "", fmt.Errorf("invalid token")
 	}
-	return claims.User_id, claims.Username, nil
+	return claims.User_id, claims.Role, nil
 }
 
 func (as *service) DeleteAccount(ctx context.Context, req specs.DeleteAccountReq, user_id int) (specs.DeleteAccount, error) {
